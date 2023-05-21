@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './group.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { GroupDTO } from './group.dto';
-import { getRandomString } from 'src/util/util';
 import { User } from 'src/user/user.entity';
 
 export interface GroupWithUserCount {
@@ -29,14 +28,14 @@ export class GroupService {
       });
       const group = this.groupRepository.create({
         name: groupDto.name,
-        code: getRandomString(10) + Date.now(),
+        code: this.getRandomString(10) + Date.now(),
         users: [user],
       });
       return this.groupRepository.save(group);
     }
     const group = new Group();
     group.name = groupDto.name;
-    group.code = getRandomString(10) + Date.now();
+    group.code = this.getRandomString(10) + Date.now();
     return this.groupRepository.save(group);
   }
 
@@ -163,5 +162,18 @@ export class GroupService {
 
   async delete(id: number): Promise<void> {
     await this.groupRepository.delete(id);
+  }
+
+  private getRandomString(length: number): string {
+    let result = '';
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
   }
 }
